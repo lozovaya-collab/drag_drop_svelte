@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+@mixin text($color) {
+    font: {
+        size: 14px;
+        family: 'Montserrat', sans-serif;
+        weight: 400px;
+    }
+    color: $color;
+}
+
+@mixin title($color) {
+    font: {
+        size: 16px;
+        family: 'Montserrat', sans-serif;
+        weight: 600px;
+    }
+    color: $color;
+}
