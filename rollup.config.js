@@ -13,7 +13,7 @@ const preprocess = sveltePreprocess({
         // includePaths: ['scss'],
 
         data: `
-        @import './src/scss/main.scss';
+        @import './src/assets/scss/main.scss';
         `,
     },
 

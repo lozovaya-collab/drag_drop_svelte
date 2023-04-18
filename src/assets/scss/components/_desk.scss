@@ -1,0 +1,85 @@
+.desk {
+    width: 200px;
+    max-width: 200px;
+    height: 80px;
+    min-height: 80px;
+    border-radius: 5px;
+    margin: 15px 10px 15px 0;
+    padding: 0 10px;
+    background-color: $purple;
+    transition: all 0.3s;
+    position: relative;
+    &_title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        @include title($white);
+        margin: 10px 0;
+    }
+    &_tasks {
+        position: relative;
+        &__item {
+            position: absolute;
+            cursor: pointer;
+            width: 200px;
+            top: 0px;
+            height: 30px;
+            margin: 5px 0;
+            border-radius: 5px;
+            background-color: $white;
+            @include text($black);
+            transition: all 0.5s;
+            .task-wrapper {
+                position: relative;
+                width: 200px;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-direction: row;
+                &_name {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                    width: 100px;
+                    margin: 0;
+                }
+                &_container {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 50px;
+                    &__icon {
+                        transition: opacity .2 ease;
+                        height: 20px;
+                        width: 20px;
+                        opacity: 0.5;
+                        &:hover {
+                            opacity: 1;
+                        }
+                    }
+                    &__login {
+                        color: $purple;
+                        font-weight: bold;
+                        font-size: 9px;
+                    }
+                }
+            }
+        }
+    }
+    &_action {
+        &-btn {
+            width: 200px;
+            opacity: 0.5;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            margin: 5px 0;
+            background-color: rgba(0, 0, 0, 0.223) !important;
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+}
