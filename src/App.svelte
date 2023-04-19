@@ -1,6 +1,8 @@
 <script>
   import MainHeader from "./layouts/MainHeader.svelte";
   import MainContent from "./layouts/MainContent.svelte";
+
+  import {location} from 'svelte-spa-router'
 </script>
 
 <svelte:head>
@@ -8,7 +10,9 @@
   <html lang="ru" />
 </svelte:head>
 <main>
-  <MainHeader/>
+  {#if $location !== '/auth/'}
+    <MainHeader />
+  {/if}
   <MainContent/>
 </main>
 

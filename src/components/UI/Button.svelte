@@ -9,8 +9,6 @@
 
     let clazz;
 	export { clazz as class };
-
-    $: classButtonType = type === 'text' ? 'button--text' : '';
     $: classButtonDisabled = disabled;
 
 </script>
@@ -18,8 +16,7 @@
 
 <button 
     on:click
-    class={`button ${clazz || ''}`}
-    class:classButtonType 
+    class={`button ${clazz || ''} ${type === 'text' ? 'button--text' : ''} ${disabled ? 'button--disabled' : ''}`}
     class:classButtonDisabled
     style:top
 >

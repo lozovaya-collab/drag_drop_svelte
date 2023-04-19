@@ -41,12 +41,20 @@ var app = (function () {
     function is_empty(obj) {
         return Object.keys(obj).length === 0;
     }
+    function validate_store(store, name) {
+        if (store != null && typeof store.subscribe !== 'function') {
+            throw new Error(`'${name}' is not a store with a 'subscribe' method`);
+        }
+    }
     function subscribe(store, ...callbacks) {
         if (store == null) {
             return noop;
         }
         const unsub = store.subscribe(...callbacks);
         return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
+    }
+    function component_subscribe(component, store, callback) {
+        component.$$.on_destroy.push(subscribe(store, callback));
     }
     function create_slot(definition, ctx, $$scope, fn) {
         if (definition) {
@@ -679,18 +687,17 @@ var app = (function () {
     	let current;
     	let mounted;
     	let dispose;
-    	const default_slot_template = /*#slots*/ ctx[7].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[6], null);
+    	const default_slot_template = /*#slots*/ ctx[6].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[5], null);
 
     	const block = {
     		c: function create() {
     			button = element("button");
     			if (default_slot) default_slot.c();
-    			attr_dev(button, "class", button_class_value = "" + (null_to_empty(`button ${/*clazz*/ ctx[1] || ''}`) + " svelte-1ydqukf"));
-    			toggle_class(button, "classButtonType", /*classButtonType*/ ctx[3]);
-    			toggle_class(button, "classButtonDisabled", /*classButtonDisabled*/ ctx[2]);
-    			set_style(button, "top", /*top*/ ctx[0], false);
-    			add_location(button, file$6, 18, 0, 365);
+    			attr_dev(button, "class", button_class_value = "" + (null_to_empty(`button ${/*clazz*/ ctx[3] || ''} ${/*type*/ ctx[0] === 'text' ? 'button--text' : ''} ${/*disabled*/ ctx[1] ? 'button--disabled' : ''}`) + " svelte-1ydqukf"));
+    			toggle_class(button, "classButtonDisabled", /*classButtonDisabled*/ ctx[4]);
+    			set_style(button, "top", /*top*/ ctx[2], false);
+    			add_location(button, file$6, 16, 0, 300);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -705,40 +712,36 @@ var app = (function () {
     			current = true;
 
     			if (!mounted) {
-    				dispose = listen_dev(button, "click", /*click_handler*/ ctx[8], false, false, false);
+    				dispose = listen_dev(button, "click", /*click_handler*/ ctx[7], false, false, false);
     				mounted = true;
     			}
     		},
     		p: function update(ctx, [dirty]) {
     			if (default_slot) {
-    				if (default_slot.p && (!current || dirty & /*$$scope*/ 64)) {
+    				if (default_slot.p && (!current || dirty & /*$$scope*/ 32)) {
     					update_slot_base(
     						default_slot,
     						default_slot_template,
     						ctx,
-    						/*$$scope*/ ctx[6],
+    						/*$$scope*/ ctx[5],
     						!current
-    						? get_all_dirty_from_scope(/*$$scope*/ ctx[6])
-    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[6], dirty, null),
+    						? get_all_dirty_from_scope(/*$$scope*/ ctx[5])
+    						: get_slot_changes(default_slot_template, /*$$scope*/ ctx[5], dirty, null),
     						null
     					);
     				}
     			}
 
-    			if (!current || dirty & /*clazz*/ 2 && button_class_value !== (button_class_value = "" + (null_to_empty(`button ${/*clazz*/ ctx[1] || ''}`) + " svelte-1ydqukf"))) {
+    			if (!current || dirty & /*clazz, type, disabled*/ 11 && button_class_value !== (button_class_value = "" + (null_to_empty(`button ${/*clazz*/ ctx[3] || ''} ${/*type*/ ctx[0] === 'text' ? 'button--text' : ''} ${/*disabled*/ ctx[1] ? 'button--disabled' : ''}`) + " svelte-1ydqukf"))) {
     				attr_dev(button, "class", button_class_value);
     			}
 
-    			if (dirty & /*clazz, classButtonType*/ 10) {
-    				toggle_class(button, "classButtonType", /*classButtonType*/ ctx[3]);
+    			if (dirty & /*clazz, type, disabled, classButtonDisabled*/ 27) {
+    				toggle_class(button, "classButtonDisabled", /*classButtonDisabled*/ ctx[4]);
     			}
 
-    			if (dirty & /*clazz, classButtonDisabled*/ 6) {
-    				toggle_class(button, "classButtonDisabled", /*classButtonDisabled*/ ctx[2]);
-    			}
-
-    			if (dirty & /*top*/ 1) {
-    				set_style(button, "top", /*top*/ ctx[0], false);
+    			if (dirty & /*top*/ 4) {
+    				set_style(button, "top", /*top*/ ctx[2], false);
     			}
     		},
     		i: function intro(local) {
@@ -770,7 +773,6 @@ var app = (function () {
     }
 
     function instance$8($$self, $$props, $$invalidate) {
-    	let classButtonType;
     	let classButtonDisabled;
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('Button', slots, ['default']);
@@ -790,11 +792,11 @@ var app = (function () {
     	}
 
     	$$self.$$set = $$props => {
-    		if ('type' in $$props) $$invalidate(4, type = $$props.type);
-    		if ('disabled' in $$props) $$invalidate(5, disabled = $$props.disabled);
-    		if ('top' in $$props) $$invalidate(0, top = $$props.top);
-    		if ('class' in $$props) $$invalidate(1, clazz = $$props.class);
-    		if ('$$scope' in $$props) $$invalidate(6, $$scope = $$props.$$scope);
+    		if ('type' in $$props) $$invalidate(0, type = $$props.type);
+    		if ('disabled' in $$props) $$invalidate(1, disabled = $$props.disabled);
+    		if ('top' in $$props) $$invalidate(2, top = $$props.top);
+    		if ('class' in $$props) $$invalidate(3, clazz = $$props.class);
+    		if ('$$scope' in $$props) $$invalidate(5, $$scope = $$props.$$scope);
     	};
 
     	$$self.$capture_state = () => ({
@@ -804,17 +806,15 @@ var app = (function () {
     		disabled,
     		top,
     		clazz,
-    		classButtonDisabled,
-    		classButtonType
+    		classButtonDisabled
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ('type' in $$props) $$invalidate(4, type = $$props.type);
-    		if ('disabled' in $$props) $$invalidate(5, disabled = $$props.disabled);
-    		if ('top' in $$props) $$invalidate(0, top = $$props.top);
-    		if ('clazz' in $$props) $$invalidate(1, clazz = $$props.clazz);
-    		if ('classButtonDisabled' in $$props) $$invalidate(2, classButtonDisabled = $$props.classButtonDisabled);
-    		if ('classButtonType' in $$props) $$invalidate(3, classButtonType = $$props.classButtonType);
+    		if ('type' in $$props) $$invalidate(0, type = $$props.type);
+    		if ('disabled' in $$props) $$invalidate(1, disabled = $$props.disabled);
+    		if ('top' in $$props) $$invalidate(2, top = $$props.top);
+    		if ('clazz' in $$props) $$invalidate(3, clazz = $$props.clazz);
+    		if ('classButtonDisabled' in $$props) $$invalidate(4, classButtonDisabled = $$props.classButtonDisabled);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -822,32 +822,18 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*type*/ 16) {
-    			$$invalidate(3, classButtonType = type === 'text' ? 'button--text' : '');
-    		}
-
-    		if ($$self.$$.dirty & /*disabled*/ 32) {
-    			$$invalidate(2, classButtonDisabled = disabled);
+    		if ($$self.$$.dirty & /*disabled*/ 2) {
+    			$$invalidate(4, classButtonDisabled = disabled);
     		}
     	};
 
-    	return [
-    		top,
-    		clazz,
-    		classButtonDisabled,
-    		classButtonType,
-    		type,
-    		disabled,
-    		$$scope,
-    		slots,
-    		click_handler
-    	];
+    	return [type, disabled, top, clazz, classButtonDisabled, $$scope, slots, click_handler];
     }
 
     class Button extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$8, create_fragment$8, safe_not_equal, { type: 4, disabled: 5, top: 0, class: 1 });
+    		init(this, options, instance$8, create_fragment$8, safe_not_equal, { type: 0, disabled: 1, top: 2, class: 3 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
@@ -859,7 +845,7 @@ var app = (function () {
     		const { ctx } = this.$$;
     		const props = options.props || {};
 
-    		if (/*clazz*/ ctx[1] === undefined && !('class' in props)) {
+    		if (/*clazz*/ ctx[3] === undefined && !('class' in props)) {
     			console.warn("<Button> was created without expected prop 'class'");
     		}
     	}
@@ -1215,7 +1201,7 @@ var app = (function () {
     }
 
     // (260:0) {#if componentParams}
-    function create_if_block(ctx) {
+    function create_if_block$1(ctx) {
     	let switch_instance;
     	let switch_instance_anchor;
     	let current;
@@ -1303,7 +1289,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block.name,
+    		id: create_if_block$1.name,
     		type: "if",
     		source: "(260:0) {#if componentParams}",
     		ctx
@@ -1317,7 +1303,7 @@ var app = (function () {
     	let if_block;
     	let if_block_anchor;
     	let current;
-    	const if_block_creators = [create_if_block, create_else_block];
+    	const if_block_creators = [create_if_block$1, create_else_block];
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
@@ -2044,7 +2030,7 @@ var app = (function () {
     const file$5 = "src/layouts/MainHeader.svelte";
 
     // (9:4) <Button on:click={() => push('#/auth/')}>
-    function create_default_slot$1(ctx) {
+    function create_default_slot$2(ctx) {
     	let t;
 
     	const block = {
@@ -2061,7 +2047,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$1.name,
+    		id: create_default_slot$2.name,
     		type: "slot",
     		source: "(9:4) <Button on:click={() => push('#/auth/')}>",
     		ctx
@@ -2079,7 +2065,7 @@ var app = (function () {
 
     	button = new Button({
     			props: {
-    				$$slots: { default: [create_default_slot$1] },
+    				$$slots: { default: [create_default_slot$2] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -2453,7 +2439,7 @@ var app = (function () {
     }
 
     // (67:4) <Button       top={top}       class="desk_action-btn"       >
-    function create_default_slot(ctx) {
+    function create_default_slot$1(ctx) {
     	let t;
 
     	const block = {
@@ -2470,7 +2456,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot.name,
+    		id: create_default_slot$1.name,
     		type: "slot",
     		source: "(67:4) <Button       top={top}       class=\\\"desk_action-btn\\\"       >",
     		ctx
@@ -2508,7 +2494,7 @@ var app = (function () {
     			props: {
     				top: /*top*/ ctx[3],
     				class: "desk_action-btn",
-    				$$slots: { default: [create_default_slot] },
+    				$$slots: { default: [create_default_slot$1] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -3050,33 +3036,177 @@ var app = (function () {
     }
 
     /* src/pages/AuthPage.svelte generated by Svelte v3.48.0 */
-
     const file$1 = "src/pages/AuthPage.svelte";
 
-    function create_fragment$2(ctx) {
-    	let div;
-    	let h1;
+    // (27:8) <Button>
+    function create_default_slot_1(ctx) {
+    	let t;
 
     	const block = {
     		c: function create() {
-    			div = element("div");
+    			t = text("ВОЙТИ");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, t, anchor);
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(t);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_default_slot_1.name,
+    		type: "slot",
+    		source: "(27:8) <Button>",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (28:8) <Button v-if="!isSignUp" type={'text'} >
+    function create_default_slot(ctx) {
+    	let t;
+
+    	const block = {
+    		c: function create() {
+    			t = text("Зарегистрироваться");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, t, anchor);
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(t);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_default_slot.name,
+    		type: "slot",
+    		source: "(28:8) <Button v-if=\\\"!isSignUp\\\" type={'text'} >",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function create_fragment$2(ctx) {
+    	let div4;
+    	let div3;
+    	let div1;
+    	let img;
+    	let img_src_value;
+    	let t0;
+    	let div0;
+    	let h1;
+    	let t2;
+    	let div2;
+    	let button0;
+    	let t3;
+    	let button1;
+    	let current;
+
+    	button0 = new Button({
+    			props: {
+    				$$slots: { default: [create_default_slot_1] },
+    				$$scope: { ctx }
+    			},
+    			$$inline: true
+    		});
+
+    	button1 = new Button({
+    			props: {
+    				"v-if": "!isSignUp",
+    				type: 'text',
+    				$$slots: { default: [create_default_slot] },
+    				$$scope: { ctx }
+    			},
+    			$$inline: true
+    		});
+
+    	const block = {
+    		c: function create() {
+    			div4 = element("div");
+    			div3 = element("div");
+    			div1 = element("div");
+    			img = element("img");
+    			t0 = space();
+    			div0 = element("div");
     			h1 = element("h1");
-    			h1.textContent = "auth page";
-    			add_location(h1, file$1, 1, 4, 10);
-    			add_location(div, file$1, 0, 0, 0);
+    			h1.textContent = "Вход";
+    			t2 = space();
+    			div2 = element("div");
+    			create_component(button0.$$.fragment);
+    			t3 = space();
+    			create_component(button1.$$.fragment);
+    			attr_dev(img, "class", "auth-page_form__header icon");
+    			if (!src_url_equal(img.src, img_src_value = srcLogo)) attr_dev(img, "src", img_src_value);
+    			attr_dev(img, "alt", "Icon ToDo App");
+    			add_location(img, file$1, 9, 8, 230);
+    			attr_dev(h1, "class", "auth-page_form__header text");
+    			add_location(h1, file$1, 15, 10, 385);
+    			attr_dev(div0, "class", "header");
+    			add_location(div0, file$1, 14, 8, 354);
+    			attr_dev(div1, "class", "auth-page_form__header");
+    			add_location(div1, file$1, 8, 6, 185);
+    			attr_dev(div2, "class", "auth-page_form__actions");
+    			add_location(div2, file$1, 25, 6, 710);
+    			attr_dev(div3, "class", "auth-page_form");
+    			add_location(div3, file$1, 7, 4, 150);
+    			attr_dev(div4, "class", "auth-page");
+    			add_location(div4, file$1, 6, 0, 122);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    			append_dev(div, h1);
+    			insert_dev(target, div4, anchor);
+    			append_dev(div4, div3);
+    			append_dev(div3, div1);
+    			append_dev(div1, img);
+    			append_dev(div1, t0);
+    			append_dev(div1, div0);
+    			append_dev(div0, h1);
+    			append_dev(div3, t2);
+    			append_dev(div3, div2);
+    			mount_component(button0, div2, null);
+    			append_dev(div2, t3);
+    			mount_component(button1, div2, null);
+    			current = true;
     		},
-    		p: noop,
-    		i: noop,
-    		o: noop,
+    		p: function update(ctx, [dirty]) {
+    			const button0_changes = {};
+
+    			if (dirty & /*$$scope*/ 1) {
+    				button0_changes.$$scope = { dirty, ctx };
+    			}
+
+    			button0.$set(button0_changes);
+    			const button1_changes = {};
+
+    			if (dirty & /*$$scope*/ 1) {
+    				button1_changes.$$scope = { dirty, ctx };
+    			}
+
+    			button1.$set(button1_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(button0.$$.fragment, local);
+    			transition_in(button1.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(button0.$$.fragment, local);
+    			transition_out(button1.$$.fragment, local);
+    			current = false;
+    		},
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
+    			if (detaching) detach_dev(div4);
+    			destroy_component(button0);
+    			destroy_component(button1);
     		}
     	};
 
@@ -3091,7 +3221,9 @@ var app = (function () {
     	return block;
     }
 
-    function instance$2($$self, $$props) {
+    const srcLogo = '../static/mountain.png';
+
+    function instance$2($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('AuthPage', slots, []);
     	const writable_props = [];
@@ -3100,6 +3232,7 @@ var app = (function () {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<AuthPage> was created with unknown prop '${key}'`);
     	});
 
+    	$$self.$capture_state = () => ({ Button, srcLogo });
     	return [];
     }
 
@@ -3196,15 +3329,53 @@ var app = (function () {
     /* src/App.svelte generated by Svelte v3.48.0 */
     const file = "src/App.svelte";
 
+    // (13:2) {#if $location !== '/auth/'}
+    function create_if_block(ctx) {
+    	let mainheader;
+    	let current;
+    	mainheader = new MainHeader({ $$inline: true });
+
+    	const block = {
+    		c: function create() {
+    			create_component(mainheader.$$.fragment);
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(mainheader, target, anchor);
+    			current = true;
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(mainheader.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(mainheader.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			destroy_component(mainheader, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block.name,
+    		type: "if",
+    		source: "(13:2) {#if $location !== '/auth/'}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
     function create_fragment(ctx) {
     	let html;
     	let t0;
     	let main;
-    	let mainheader;
     	let t1;
     	let maincontent;
     	let current;
-    	mainheader = new MainHeader({ $$inline: true });
+    	let if_block = /*$location*/ ctx[0] !== '/auth/' && create_if_block(ctx);
     	maincontent = new MainContent({ $$inline: true });
 
     	const block = {
@@ -3212,13 +3383,13 @@ var app = (function () {
     			html = element("html");
     			t0 = space();
     			main = element("main");
-    			create_component(mainheader.$$.fragment);
+    			if (if_block) if_block.c();
     			t1 = space();
     			create_component(maincontent.$$.fragment);
     			document.title = "Svelte To Do App";
     			attr_dev(html, "lang", "ru");
-    			add_location(html, file, 7, 2, 184);
-    			add_location(main, file, 9, 0, 218);
+    			add_location(html, file, 9, 2, 230);
+    			add_location(main, file, 11, 0, 264);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3227,20 +3398,41 @@ var app = (function () {
     			append_dev(document.head, html);
     			insert_dev(target, t0, anchor);
     			insert_dev(target, main, anchor);
-    			mount_component(mainheader, main, null);
+    			if (if_block) if_block.m(main, null);
     			append_dev(main, t1);
     			mount_component(maincontent, main, null);
     			current = true;
     		},
-    		p: noop,
+    		p: function update(ctx, [dirty]) {
+    			if (/*$location*/ ctx[0] !== '/auth/') {
+    				if (if_block) {
+    					if (dirty & /*$location*/ 1) {
+    						transition_in(if_block, 1);
+    					}
+    				} else {
+    					if_block = create_if_block(ctx);
+    					if_block.c();
+    					transition_in(if_block, 1);
+    					if_block.m(main, t1);
+    				}
+    			} else if (if_block) {
+    				group_outros();
+
+    				transition_out(if_block, 1, 1, () => {
+    					if_block = null;
+    				});
+
+    				check_outros();
+    			}
+    		},
     		i: function intro(local) {
     			if (current) return;
-    			transition_in(mainheader.$$.fragment, local);
+    			transition_in(if_block);
     			transition_in(maincontent.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
-    			transition_out(mainheader.$$.fragment, local);
+    			transition_out(if_block);
     			transition_out(maincontent.$$.fragment, local);
     			current = false;
     		},
@@ -3248,7 +3440,7 @@ var app = (function () {
     			detach_dev(html);
     			if (detaching) detach_dev(t0);
     			if (detaching) detach_dev(main);
-    			destroy_component(mainheader);
+    			if (if_block) if_block.d();
     			destroy_component(maincontent);
     		}
     	};
@@ -3265,6 +3457,9 @@ var app = (function () {
     }
 
     function instance($$self, $$props, $$invalidate) {
+    	let $location;
+    	validate_store(location, 'location');
+    	component_subscribe($$self, location, $$value => $$invalidate(0, $location = $$value));
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('App', slots, []);
     	const writable_props = [];
@@ -3273,8 +3468,14 @@ var app = (function () {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<App> was created with unknown prop '${key}'`);
     	});
 
-    	$$self.$capture_state = () => ({ MainHeader, MainContent });
-    	return [];
+    	$$self.$capture_state = () => ({
+    		MainHeader,
+    		MainContent,
+    		location,
+    		$location
+    	});
+
+    	return [$location];
     }
 
     class App extends SvelteComponentDev {
