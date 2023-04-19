@@ -1,5 +1,6 @@
 <script>
   import Task from "./Task.svelte";
+  import Button from "./UI/Button.svelte";
 
   export let title;
   export let categID;
@@ -37,7 +38,11 @@
 
   $: height =
     82 +
-    (tasks.filter((item) => item.categoryId === categID).length - 1) * 42 +
+    (tasks.filter((item) => item.categoryId === categID).length - 1) * 42 + 42 +
+    "px";
+
+  $: top =
+    (tasks.filter((item) => item.categoryId === categID).length * 40)+
     "px";
 </script>
 
@@ -59,8 +64,12 @@
         name={task.title}
       />
     {/each}
+    <Button
+      top={top}
+      class="desk_action-btn"
+      >Добавить задачу</Button
+    >
+    
   </div>
 </div>
 
-<style>
-</style>

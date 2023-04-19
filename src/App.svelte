@@ -1,13 +1,17 @@
 <script>
-  import Router from 'svelte-spa-router';
-  import HomePage from './routes/HomePage.svelte';
-  import AuthPage from './routes/AuthPage.svelte';
-
-  const routes  = { '/auth': AuthPage, '/*' : HomePage}
+  import MainHeader from "./layouts/MainHeader.svelte";
+  import MainContent from "./layouts/MainContent.svelte";
 </script>
 
+<svelte:head>
+  <title>Svelte To Do App</title>
+  <html lang="ru" />
+</svelte:head>
 <main>
-  <Router {routes}/>
-
-  <!-- <svelte:component this={component}/> -->
+  <MainHeader/>
+  <MainContent/>
 </main>
+
+<style global lang="scss">
+  @import "./assets/scss/main.scss";
+</style>
