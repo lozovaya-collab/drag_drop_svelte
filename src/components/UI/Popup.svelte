@@ -1,36 +1,29 @@
-<!-- <template>
-  <Transition>
-    <div v-if="dialog" class="popup">
-      <div class="popup_wrapper">
-        <h3 class="popup_title">
-          <slot name="title"></slot>
-        </h3>
-        <div class="popup_content">
-          <slot name="content"></slot>
-        </div>
-        <div class="popup_actions">
-          <slot name="actions"></slot>
-        </div>
-      </div>
-    </div>
-  </Transition>
-</template>
 
 <script>
-export default {
-  name: "Popup",
-  props: {
-    dialog: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  components: {},
-};
+    import { fade } from 'svelte/transition';
+
+    export let dialog = false;
 </script>
 
-<style lang="scss" scoped>
-@import "@/assets/scss/main.scss";
+{#if dialog}
+    <div transition:fade class="popup">
+        <div class="popup_wrapper">
+        <h3 class="popup_title">
+            <slot name="title"></slot>
+        </h3>
+        <div class="popup_content">
+            <slot name="content"></slot>
+        </div>
+        <div class="popup_actions">
+            <slot name="actions"></slot>
+        </div>
+        </div>
+    </div>
+{/if}
+
+
+<style lang="scss">
+@import "../../assets/scss/main.scss";
 .popup {
   z-index: 10;
   position: fixed;
@@ -66,15 +59,4 @@ export default {
     gap: 10px;
   }
 }
-
-/* we will explain what these classes do next! */
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
-}
-</style> -->
+</style>

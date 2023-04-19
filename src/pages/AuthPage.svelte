@@ -1,7 +1,10 @@
 <script>
     import Button from "../components/UI/Button.svelte"
+    import FormAuth from "../components/FormAuth.svelte";
 
-    const srcLogo = '../static/mountain.png'
+    const srcLogo = '../static/mountain.png';
+
+    let user = { login: null, password: null };
 </script>
 
 <div class="auth-page">
@@ -22,7 +25,7 @@
           {{ mess ? mess : err }}
         </p> -->
       </div>
-      <!-- <FormAuth v-model:user="user" @update:user="user = $event" /> -->
+      <FormAuth bind:user />
       <div class="auth-page_form__actions">
         <Button>ВОЙТИ</Button>
         <Button v-if="!isSignUp" type={'text'} >
