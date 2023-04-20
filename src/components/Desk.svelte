@@ -1,23 +1,41 @@
 <script>
+  import { apiService } from "../shared/api/swagger/swagger";
+
   import Task from "./Task.svelte";
   import Button from "./UI/Button.svelte";
   import CreateTaskPopup from "./CreateTaskPopup.svelte";
+  import EditTaskPopup from "./EditTaskPopup.svelte";
 
   export let title;
   export let statusID;
   export let tasks;
+  export let users;
 
   let currTask = null;
   let selectedStatus = null;
   let selectedTaskId = null;
 
-  $: selectedStatusBoolean = !!selectedStatus;
-  $: selectedTaskIdBoolean = !!selectedTaskId;
-
-
+  const currentUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
+  
   function openCreateTask(statusId) {
       selectedStatus = statusId;
       selectedTaskId = null;
+  }
+
+  function openEditPopup(event) {
+      selectedStatus = null;
+      selectedTaskId = event.detail.id;
+  }
+
+  function deleteTask(event) {
+    const id = event.detail.id;
+
+    if (id)
+        apiService.tasks.Delete(id).then(() => {
+          apiService.tasks.Get().then((res) => {
+            tasks = res.data;
+          });
+        });
   }
 
   function onDragStart(event, task) {
@@ -37,6 +55,12 @@
       if (x.id == taskId) {
         addTaskToArray(currTask, x, tasks);
         x.status_id = statusId;
+
+        apiService.tasks.Update(x.id, {
+            status_id: x.status_id,
+            description: x.description,
+            title: x.title,
+        });
       }
       return x;
     });
@@ -73,8 +97,15 @@
       <Task
         on:dragstart={(event) => onDragStart(event, task)}
         on:dragover={(event) => onDragOver(task, event)}
+        on:deleteTask={(event) => deleteTask(event)}
+        on:edit={(event) => openEditPopup(event)}
+        userLogin={task.author_id === currentUser.id ? 
+          -1 
+          : 
+          users.find((item) => item.id === task.author_id) &&
+          users.find((item) => item.id === task.author_id).login}
         index={ind}
-        name={task.title}
+        task={task}
       />
     {/each}
     <Button
@@ -87,10 +118,17 @@
   </div>
 </div>
 {#if !!selectedStatus}
-<CreateTaskPopup 
-    bind:isOpen={selectedStatusBoolean}
-    statusId={selectedStatus}
-    bind:tasks/>
+  <CreateTaskPopup 
+      bind:isOpen={selectedStatus}
+      statusId={selectedStatus}
+      bind:tasks/>
+{/if}
+{#if !!selectedTaskId}
+  <EditTaskPopup 
+      bind:isOpen={selectedTaskId}
+      taskId={selectedTaskId}
+      bind:tasks
+      bind:user={currentUser.id}/>
 {/if}
 
 
